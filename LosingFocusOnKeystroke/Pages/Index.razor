@@ -1,0 +1,58 @@
+﻿@page "/"
+@using LosingFocusOnKeystroke.Data
+
+<h3>Supposed Bug</h3>
+
+<p>If a new view model is added via the add button only round about 1 character (depending on how fast you type) can be input into the BusinessKey TextBox before the cell loses focus.</p>
+<p>The problem might has to do with the editor template i use. If i remove the editor template the input is working fine. But i need the editor template for my implementation.</p>
+<p>It might also has to do with the binding (maybe the ValueChangedEvent), because if Value instead of bind-value is used for the TextBox it also works fine. But i want to use the two-way-binding of the TextBox component.</p>
+<p>The problem exists only for add (new) objects. If an existing view model is edited via the edit button the focus won't be lost.</p>
+<p>Problem exists supposedly only in TreeList. In Grid it is working fine.</p>
+
+<TelerikTreeList Data="@Data"
+                 IdField="@nameof(ViewModel.Id)"
+                 ParentIdField="@nameof(ViewModel.ParentId)"
+                 Pageable="false"
+                 Resizable="true"
+                 Reorderable="false">
+    <TreeListToolBar>
+        <TreeListCommandButton Command="Add" Icon="add">Add</TreeListCommandButton>
+    </TreeListToolBar>
+    <TreeListColumns>
+        <TreeListColumn Field="BusinessKey" Expandable="true" Title="BusinessKey" Width="100px">
+            <EditorTemplate Context="vm">
+                @{
+                    <TelerikTextBox @bind-Value=@(((ViewModel)vm).BusinessKey) />
+                }
+            </EditorTemplate>
+        </TreeListColumn>
+        <TreeListColumn Field="Name" Width="250px"></TreeListColumn>
+        <TreeListCommandColumn Width="220px">
+            <TreeListCommandButton Command="Add" Icon="add"></TreeListCommandButton>
+            <TreeListCommandButton Command="Edit" Icon="edit"></TreeListCommandButton>
+            <TreeListCommandButton Command="Delete" Icon="delete"></TreeListCommandButton>
+            <TreeListCommandButton Command="Save" Icon="save" ShowInEdit="true"></TreeListCommandButton>
+            <TreeListCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true"></TreeListCommandButton>
+        </TreeListCommandColumn>
+    </TreeListColumns>
+</TelerikTreeList>
+
+@code {
+
+    public List<ViewModel> Data { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var a = new ViewModel { Id = Guid.NewGuid(), BusinessKey = "A", Name = "aaa", Parent = null };
+        var b = new ViewModel { Id = Guid.NewGuid(), BusinessKey = "B", Name = "bbb", Parent = a };
+        var c = new ViewModel { Id = Guid.NewGuid(), BusinessKey = "C", Name = "ccc", Parent = b };
+        var d = new ViewModel { Id = Guid.NewGuid(), BusinessKey = "D", Name = "ddd", Parent = a };
+        var e = new ViewModel { Id = Guid.NewGuid(), BusinessKey = "E", Name = "eee", Parent = d };
+
+
+        Data = new List<ViewModel> { a, b, c, d, e };
+
+        base.OnInitialized();
+    }
+
+}
